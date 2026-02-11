@@ -1,0 +1,20 @@
+# Core dependencies
+opencv-python==4.8.1.78
+yt-dlp==2023.12.30
+pyyaml==6.0.1
+
+# Optional: Document generation
+python-docx==1.1.0
+
+# Optional: Google Docs API
+google-auth==2.25.2
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.111.0
+
+# Optional: VideoRAG Q&A mode
+# Note: VideoRAG requires separate installation (see docs/installation.md)
+# torch>=2.0.0
+# transformers>=4.35.0
+# accelerate>=0.25.0
+# moviepy>=1.0.3

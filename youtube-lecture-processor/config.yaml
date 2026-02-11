@@ -1,0 +1,25 @@
+# YouTube Lecture Processor Configuration
+
+keyframe_extraction:
+  scene_threshold: 30.0        # Scene change sensitivity (20-50)
+  interval_seconds: 10         # Fallback interval when no scene changes
+  output_format: jpg           # jpg or png
+
+document_generation:
+  default_format: html         # html, docx, or gdoc
+  html:
+    embed_images: true         # Base64 embed vs file references
+  docx:
+    image_width_inches: 3.0
+
+videorag:
+  default_llm: openai
+  models:
+    openai: gpt-4o-mini
+    anthropic: claude-3-5-sonnet-20241022
+    gemini: gemini-1.5-flash
+    ollama: llama3.1:8b
+
+paths:
+  working_dir: ./working       # Default working directory
+  output_dir: ./output         # Default output directory

@@ -1,0 +1,27 @@
+# Configuration for mixed content lectures
+#
+# Use this for:
+# - Lectures mixing slides and live demos
+# - Videos with varied pacing
+# - General-purpose processing
+
+keyframe_extraction:
+  scene_threshold: 30.0         # Balanced sensitivity
+  interval_seconds: 12          # Slightly longer interval
+  output_format: jpg            # Standard format
+
+document_generation:
+  default_format: html          # Versatile output
+  html:
+    embed_images: true          # Portable documents
+
+videorag:
+  default_llm: openai
+  models:
+    openai: gpt-4o-mini
+    anthropic: claude-3-5-sonnet-20241022
+    gemini: gemini-1.5-flash
+
+paths:
+  working_dir: ./working
+  output_dir: ./output

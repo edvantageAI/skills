@@ -1,0 +1,25 @@
+# Configuration for lecture videos with frequent slide transitions
+#
+# Use this for:
+# - PowerPoint/Keynote presentations
+# - Slide-heavy lectures
+# - Conference talks with slides
+
+keyframe_extraction:
+  scene_threshold: 25.0         # More sensitive to detect slide changes
+  interval_seconds: 15          # Longer interval for safety
+  output_format: png            # PNG for text clarity
+
+document_generation:
+  default_format: docx          # DOCX for professional documents
+  docx:
+    image_width_inches: 4.0     # Larger images to read slide text
+
+videorag:
+  default_llm: openai
+  models:
+    openai: gpt-4o-mini
+
+paths:
+  working_dir: ./working
+  output_dir: ./output

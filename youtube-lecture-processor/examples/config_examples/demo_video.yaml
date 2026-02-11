@@ -1,0 +1,25 @@
+# Configuration for software demonstration videos
+#
+# Use this for:
+# - Coding tutorials
+# - Software walkthroughs
+# - Screen recordings with minor changes
+
+keyframe_extraction:
+  scene_threshold: 40.0         # Less sensitive to ignore cursor movement
+  interval_seconds: 10          # Standard interval
+  output_format: jpg            # JPG for smaller file size
+
+document_generation:
+  default_format: html          # HTML for quick sharing
+  html:
+    embed_images: true          # Single-file output
+
+videorag:
+  default_llm: openai
+  models:
+    openai: gpt-4o-mini
+
+paths:
+  working_dir: ./working
+  output_dir: ./output
