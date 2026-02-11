@@ -123,8 +123,11 @@ python scripts/video_qa.py --working-dir ./qa-index --interactive
 
 ## Requirements
 
-**Core:**
+**System:**
 - Python 3.11 or higher
+- [Git LFS](https://git-lfs.github.com/) (`brew install git-lfs`)
+
+**Core Python packages:**
 - opencv-python
 - yt-dlp
 - PyYAML
