@@ -1,0 +1,5 @@
+{
+  "bucket": "edvantage-ai",
+  "prefix": "skills/",
+  "publicBaseUrl": "https://storage.googleapis.com/edvantage-ai"
+}

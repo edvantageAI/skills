@@ -1,0 +1,77 @@
+# Publish this repository's skills to its Cloud Storage bucket.
+#
+# THIS FILE IS VENDORED, like the script it runs. The canonical copy is in
+# content-generator at `ci/publish-skills.yml`.
+#
+# The repository is the source of truth: every run rebuilds the catalogue from
+# what is on disk, so deleting a package directory removes it from index.json.
+name: Publish skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*/*/SKILL.md"
+      - "*/*/**"
+      - "skills.config.json"
+      - ".github/scripts/publish-skills.mjs"
+      - ".github/workflows/publish-skills.yml"
+  # So a publish can be re-run without an empty commit, and so the first run
+  # after setting the secrets does not need one either.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List the work without uploading"
+        type: boolean
+        default: false
+
+# index.json is rebuilt whole on every run, so two concurrent runs would race
+# and the loser's catalogue would win. Queue them instead, and never cancel a
+# run mid-upload.
+concurrency:
+  group: publish-skills
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          # Workload Identity Federation, not a service account key: the
+          # organisation enforces constraints/iam.disableServiceAccountKeyCreation,
+          # and a key would be a long-lived credential sitting in a secret with
+          # nobody rotating it. GitHub's OIDC token is exchanged for a
+          # short-lived access token instead, and the provider's attribute
+          # condition pins it to this one repository, so another repository's
+          # token cannot mint credentials for this bucket.
+          #
+          # Both values are identifiers rather than secrets. They are held as
+          # secrets anyway so this file stays byte-identical across tenants --
+          # `tools/vendor-ci.mjs --check` asserts exactly that.
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          # The publisher talks to the JSON API with a bearer token, so it
+          # needs no gcloud and no SDK on the runner.
+          token_format: access_token
+
+      - name: Publish
+        env:
+          GCS_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          # The bundle's unguessable name. Held as a secret and passed in, never
+          # generated: other repositories hold the same value, and a fresh one
+          # would silently rotate the only thing gating the bundle.
+          SKILLS_BUNDLE_KEY: ${{ secrets.SKILLS_BUNDLE_KEY }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: node .github/scripts/publish-skills.mjs
