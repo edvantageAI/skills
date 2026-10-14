@@ -9,8 +9,20 @@
  * never patch one repository's copy alone.
  *
  * It is vendored rather than imported so a skills repository can publish
- * itself with nothing but a checkout and a service-account key -- no access to
- * the private engine, no token beyond the one that writes to its own bucket.
+ * itself with nothing but a checkout and a short-lived federated token -- no
+ * access to the private engine, no credential beyond the one that writes to
+ * its own bucket.
+ *
+ * The "upload only what changed" check compares the md5 of the zip this run
+ * built against the md5 in the bucket. That is only stable while the
+ * compressor is: deflate output differs between zlib versions, so the same
+ * files built on a different Node produce a different archive and every
+ * package looks changed. The workflow pins `node-version: "22"`, which floats
+ * across patch releases, so expect an occasional run that re-uploads
+ * everything after a runner bump. Content stays correct -- it is the skip
+ * optimisation that lapses, not the result. Comparing a hash of the package's
+ * *inputs* held in object metadata would be immune to this; it is not worth
+ * the complexity until the archives get big.
  *
  * The repository is the source of truth. Every run rebuilds `index.json` from
  * what is on disk, so deleting a package directory removes it from the
