@@ -175,10 +175,27 @@ export function frontmatter(text) {
   const m = /^---\r?\n([\s\S]*?)\r?\n---/u.exec(String(text || ""));
   if (!m) return {};
   const out = {};
-  for (const line of m[1].split(/\r?\n/u)) {
-    const kv = /^([A-Za-z0-9_-]+):\s*(.*)$/u.exec(line);
+  const lines = m[1].split(/\r?\n/u);
+  for (let i = 0; i < lines.length; i++) {
+    const kv = /^([A-Za-z0-9_-]+):\s*(.*)$/u.exec(lines[i]);
     if (!kv) continue;
-    out[kv[1]] = kv[2].trim().replace(/^["']|["']$/gu, "");
+    const value = kv[2].trim();
+    // A block scalar (`>`, `>-`, `|`, `|-`) or a bare `key:` puts the value on
+    // the indented lines below. A third of the skills write their description
+    // that way, and reading only the first line gave the catalogue an empty
+    // string -- or, worse, a literal ">" -- for every one of them.
+    //
+    // Fold the continuation, as the engine's parser does in
+    // lib/content-types/skill-spec.mjs. That parser also turns an indented
+    // `key: value` run into a nested map, for `metadata:`. This one does not:
+    // it reads name, description and version, which are all scalars.
+    if (value === "" || value === ">" || value === ">-" || value === "|" || value === "|-") {
+      const block = [];
+      while (i + 1 < lines.length && /^\s+\S/u.test(lines[i + 1])) block.push(lines[++i].trim());
+      out[kv[1]] = block.join(" ").trim();
+      continue;
+    }
+    out[kv[1]] = value.replace(/^["']|["']$/gu, "");
   }
   return out;
 }
